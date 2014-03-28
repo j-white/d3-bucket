@@ -3,14 +3,19 @@
 <head lang="en">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-    <script src="https:////code.jquery.com/jquery-2.1.0.min.js"></script>
-    <script src="https:////code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="https://rawgithub.com/j-white/d3-bucket/master/d3.bucket.js"></script>
     <script>
         $(document).ready(function() {
+            // Empty the div before creating the bucket since htmlpreview.github.io
+            // is currently duplicating this block of code.
+            var bucketDiv = $("#bucket1");
+            bucketDiv.empty();
+
             var bucket1 = new Bucket({
-                element: document.getElementById("bucket1"),
+                element: bucketDiv[0],
                 width: 350,
                 height: 350,
                 waveFrequency: 0.05,
