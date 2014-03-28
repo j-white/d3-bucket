@@ -92,26 +92,6 @@ var Bucket = function(args) {
         return this;
     };
 
-    this._renderFill = function() {
-        var bucketFill = function(level){ return [
-            {x: 0, y: level}, // top-left
-            {x: 0, y: 0},  // bottom-left
-            {x: 100, y: 0}, // bottom-right
-            {x: 100, y: level} //top-right
-        ]};
-        var fill = this.svg.select("#bucketFill");
-        if (fill.empty()) {
-            fill = this.svg.append("path")
-                .attr('id', 'bucketFill')
-                .attr("class", "line");
-        }
-        if (fill.attr('level') !== this.level) {
-            fill.attr('level', this.level)
-                .attr('fill', this.fillColor())
-                .attr("d", this._line(bucketFill(this.level)));
-        }
-    };
-
     this._generateWaveVector = function(t) {
         var level = this.level;
 
@@ -146,29 +126,29 @@ var Bucket = function(args) {
         });
 
         /*
-         Add extra points to close the loop.
+         Add the lower portion of the bucket (bellow the wave)
+         to the path and close the loop.
          */
-        var bufferLength = Math.min(5, level);
         var before = [
-            {x: 0,y: level - bufferLength},
+            {x: 0,y: 0},
             {x: 0,y: level}
         ];
         var after = [
             {x: 100, y: level},
-            {x: 100, y: level - bufferLength},
-            {x: 0,y: level - bufferLength}
+            {x: 100, y: 0},
+            {x: 0, y: 0}
         ];
         return before.concat(vector).concat(after);
     };
 
-    this._renderWave = function(t) {
-        var wave = this.svg.select("#wavePath");
-        if (wave.empty()) {
-            wave = this.svg.append("path")
-                .attr('id', 'wavePath')
+    this._renderFill = function(t) {
+        var fill = this.svg.select("#fillPath");
+        if (fill.empty()) {
+            fill = this.svg.append("path")
+                .attr('id', 'fillPath')
                 .attr("class", "line");
         }
-        wave.attr('fill', this.fillColor())
+        fill.attr('fill', this.fillColor())
             .attr("stroke", this.fillColor())
             .attr("d", this._line(this._generateWaveVector(t)));
     };
@@ -194,7 +174,6 @@ var Bucket = function(args) {
 
     this._render = function(t) {
         this._renderFill(t);
-        this._renderWave(t);
         this._renderContour(t);
     };
 
