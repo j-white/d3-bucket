@@ -99,13 +99,14 @@ var Bucket = function(args) {
             {x: 100, y: 0}, // bottom-right
             {x: 100, y: level} //top-right
         ]};
-        if (this.fill === undefined) {
-            this.fill = this.svg.append("path")
+        var fill = this.svg.select("#bucketFill");
+        if (fill.empty()) {
+            fill = this.svg.append("path")
                 .attr('id', 'bucketFill')
                 .attr("class", "line");
         }
-        if (this.fill.attr('level') !== this.level) {
-            this.fill.attr('level', this.level)
+        if (fill.attr('level') !== this.level) {
+            fill.attr('level', this.level)
                 .attr('fill', this.fillColor())
                 .attr("d", this._line(bucketFill(this.level)));
         }
@@ -161,12 +162,13 @@ var Bucket = function(args) {
     };
 
     this._renderWave = function(t) {
-        if (this.wave === undefined) {
-            this.wave = this.svg.append("path")
+        var wave = this.svg.select("#wavePath");
+        if (wave.empty()) {
+            wave = this.svg.append("path")
                 .attr('id', 'wavePath')
                 .attr("class", "line");
         }
-        this.wave.attr('fill', this.fillColor())
+        wave.attr('fill', this.fillColor())
             .attr("stroke", this.fillColor())
             .attr("d", this._line(this._generateWaveVector(t)));
     };
@@ -197,10 +199,19 @@ var Bucket = function(args) {
     };
 
     this.render = function() {
+        // Clear the container
+        this.svg.selectAll('*').remove();
+
+        // Cancel any previous timers
+        if (this.renderInterval !== undefined) {
+            clearInterval(this.renderInterval);
+        }
+
+        // Re-draw every 100ms
         var bucket = this;
         var t = 0;
         bucket._render(t);
-        setInterval(function () {
+        this.renderInterval = setInterval(function () {
             bucket._render(t);
             t += 100;
         }, 100);
@@ -208,4 +219,3 @@ var Bucket = function(args) {
 
     this.initialize(args);
 };
-
