@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="../vendor/d3.v3.min.js"></script>
+    <script src="../d3.bucket.js"></script>
+</head>
+<body>
+    <div id="container" style="width: 275px; margin-left: 30px;">
+        <p>
+            <label for="level">Level:</label>
+            <input type="text" id="level" style="border:0; font-weight:bold;">
+        </p>
+        <div id="slider"></div>
+    </div>
+    <div id="bucket1"></div>
+
+    <script>
+        var $j = jQuery.noConflict();
+        $j(document).ready(function() {
+            var bucket1 = new Bucket({
+                element: document.getElementById("bucket1"),
+                width: 350,
+                height: 350,
+                waveFrequency: 0.05,
+                waveHeight: 10,
+                level: 50
+            });
+            bucket1.render();
+
+            var slider = $j("#slider");
+            slider.slider({
+                value: bucket1.level,
+                min: 0,
+                max: 100,
+                step: 1,
+                slide: function(event, ui) {
+                    bucket1.setLevel(ui.value);
+                    $j("#level").val(ui.value);
+                }
+            });
+            $j("#level").val(slider.slider("value"));
+        });
+    </script>
+</body>
+</html>
