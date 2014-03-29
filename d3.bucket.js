@@ -5,6 +5,7 @@ var Bucket = function(args) {
             defaultHeight = 350,
             defaultMargin = 40,
             defaultLevel = 50,
+            defaultFillColor,
             defaultPhase = 0,
             defaultFrequency = 0.18,
             defaultAmplitude = 6,
@@ -42,6 +43,22 @@ var Bucket = function(args) {
             this.level(args.level);
         } else {
             this.level(defaultLevel);
+        }
+
+        defaultFillColor = function(level) {
+            if (level < 75) {
+                return "green";
+            } else if (level < 90) {
+                return "yellow";
+            } else {
+                return "red";
+            }
+        };
+
+        if (args.fillColor !== undefined) {
+            this.fillColor(args.fillColor);
+        } else {
+            this.fillColor(defaultFillColor);
         }
 
         if (args.phase !== undefined) {
@@ -166,14 +183,13 @@ var Bucket = function(args) {
         return this;
     };
 
-    this.fillColor = function() {
-        if (this._level < 75) {
-            return "green";
-        } else if (this._level < 90) {
-            return "yellow";
+    this.fillColor = function(fillColor) {
+        if (fillColor === undefined) {
+            return this._fillColor;
         } else {
-            return "red";
+            this._fillColor = fillColor;
         }
+        return this;
     };
 
     this._generateWaveVector = function(t) {
@@ -230,8 +246,8 @@ var Bucket = function(args) {
                 .attr('id', 'fillPath')
                 .attr("class", "line");
         }
-        fill.attr('fill', this.fillColor())
-            .attr("stroke", this.fillColor())
+        fill.attr('fill', this._fillColor(this.level()))
+            .attr("stroke", this._fillColor(this.level()))
             .attr("d", this._line(this._generateWaveVector(t)));
     };
 
