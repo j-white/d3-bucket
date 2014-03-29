@@ -1,5 +1,5 @@
 var Bucket = function(args) {
-    "use strict";
+    'use strict';
     this.initialize = function(args) {
         var defaultWidth = 500,
             defaultHeight = 350,
@@ -14,10 +14,10 @@ var Bucket = function(args) {
             elementHeight = 0;
 
         if (!args.element) {
-            throw "Bucket needs a reference to an element";
+            throw 'Bucket needs a reference to an element';
         }
         if (args.element.nodeType !== 1) {
-            throw "Bucket element was defined but not an HTML element";
+            throw 'Bucket element was defined but not an HTML element';
         }
         this.element = args.element;
 
@@ -47,11 +47,11 @@ var Bucket = function(args) {
 
         defaultFillColor = function(level) {
             if (level < 75) {
-                return "green";
+                return 'green';
             } else if (level < 90) {
-                return "yellow";
+                return 'yellow';
             } else {
-                return "red";
+                return 'red';
             }
         };
 
@@ -87,7 +87,7 @@ var Bucket = function(args) {
 
         // Append the SVG container to the HTML element
         this.svg = d3.select(this.element)
-            .append("svg:svg")
+            .append('svg:svg')
             .attr('width', this._width)
             .attr('height', this._height);
 
@@ -105,7 +105,7 @@ var Bucket = function(args) {
         this._line = d3.svg.line()
             .x(function(d){return x(d.x);})
             .y(function(d){return y(d.y);})
-            .interpolate("linear");
+            .interpolate('linear');
     };
 
     this.width = function(width) {
@@ -240,15 +240,15 @@ var Bucket = function(args) {
     };
 
     this._renderFill = function(t) {
-        var fill = this.svg.select("#fillPath");
+        var fill = this.svg.select('#fillPath');
         if (fill.empty()) {
-            fill = this.svg.append("path")
+            fill = this.svg.append('path')
                 .attr('id', 'fillPath')
-                .attr("class", "line");
+                .attr('class', 'line');
         }
         fill.attr('fill', this._fillColor(this.level()))
-            .attr("stroke", this._fillColor(this.level()))
-            .attr("d", this._line(this._generateWaveVector(t)));
+            .attr('stroke', this._fillColor(this.level()))
+            .attr('d', this._line(this._generateWaveVector(t)));
     };
 
     this._renderContour = function() {
@@ -261,13 +261,13 @@ var Bucket = function(args) {
         ];
 
         // Redraw the contour over all of the other content
-        this.svg.select("#bucketContour").remove();
-        this.svg.append("path")
+        this.svg.select('#bucketContour').remove();
+        this.svg.append('path')
             .attr('id', 'bucketContour')
             .attr('fill', 'none')
-            .attr("stroke", "black")
-            .attr("stroke-width", 4)
-            .attr("d", this._line(bucketContour));
+            .attr('stroke', 'black')
+            .attr('stroke-width', 4)
+            .attr('d', this._line(bucketContour));
     };
 
     this._render = function(t) {
