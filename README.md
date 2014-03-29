@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/j-white/d3-bucket.svg?branch=master)](https://travis-ci.org/j-white/d3-bucket)
+
 d3-bucket
 ====
 
