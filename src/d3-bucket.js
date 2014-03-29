@@ -90,8 +90,21 @@ var Bucket = function(args) {
             .append('svg:svg')
             .attr('width', this._width)
             .attr('height', this._height);
+    };
 
-        // Setup our scales. The remaining functions will assume the canvas has
+    this._onDimensionChange = function() {
+        // Do nothing if any of the dimensions are undefined.
+        if (this._width === undefined ||
+            this._height === undefined ||
+            this._margin === undefined) {
+            return;
+        }
+
+        if (this.svg !== undefined) {
+            this.svg.attr('width', this._width).attr('height', this._height);
+        }
+
+        // Setup our scales. The other functions will assume the canvas has
         // a domain of { (x,y) | 0 <= x <= 100, 0 <= y <= 100 }
         var x = d3.scale.linear()
             .domain([0, 100])
@@ -113,9 +126,7 @@ var Bucket = function(args) {
             return this._width;
         }
         this._width = width;
-        if (this.svg !== undefined) {
-            this.svg.attr('width', this._width);
-        }
+        this._onDimensionChange();
         return this;
     };
 
@@ -124,9 +135,7 @@ var Bucket = function(args) {
             return this._height;
         }
         this._height = height;
-        if (this.svg !== undefined) {
-            this.svg.attr('height', this._height);
-        }
+        this._onDimensionChange();
         return this;
     };
 
@@ -135,6 +144,7 @@ var Bucket = function(args) {
             return this._margin;
         }
         this._margin = margin;
+        this._onDimensionChange();
         return this;
     };
 
@@ -275,23 +285,33 @@ var Bucket = function(args) {
         this._renderContour();
     };
 
-    this.render = function() {
+    this.render = function(doNotLoop) {
+        // Cancel any previous timers
+        if (this._renderInterval !== undefined) {
+            clearInterval(this._renderInterval);
+            this._renderInterval = undefined;
+        }
+
         // Clear the container
         this.svg.selectAll('*').remove();
 
-        // Cancel any previous timers
-        if (this.renderInterval !== undefined) {
-            clearInterval(this.renderInterval);
-        }
-
-        // Re-draw every 100ms
+        // Render the scene
         var bucket = this;
         var t = 0;
         bucket._render(t);
-        this.renderInterval = setInterval(function () {
+
+        // Stop here if were told not to loop
+        if (doNotLoop) {
+            return this;
+        }
+
+        // Otherwise re-draw the scene every 100ms to animate the wave
+        this._renderInterval = setInterval(function () {
             bucket._render(t);
             t += 100;
         }, 100);
+
+        return this;
     };
 
     this.initialize(args);
