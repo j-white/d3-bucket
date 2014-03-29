@@ -1,3 +1,7 @@
+/**
+ * Represents a bucket.
+ * @constructor
+ */
 var Bucket = function(args) {
     'use strict';
     this.initialize = function(args) {
@@ -90,6 +94,14 @@ var Bucket = function(args) {
             .append('svg:svg')
             .attr('width', this._width)
             .attr('height', this._height);
+
+        // Save the bucket's contour since it does not change
+        this._bucketContour = [
+            {x: 0, y: 100}, // top-left
+            {x: 0, y: 0},  // bottom-left
+            {x: 100, y: 0}, // bottom-right
+            {x: 100, y: 100} //top-right
+        ];
     };
 
     this._onDimensionChange = function() {
@@ -121,6 +133,14 @@ var Bucket = function(args) {
             .interpolate('linear');
     };
 
+    /** Sets or retrieves the width of the SVG container.
+     * @param {?string} width - The width of the SVG container.
+     * @return {string|Bucket} The current width if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.width('100px')
+     * bucket.width('100%')
+     * var width = bucket.width()
+     */
     this.width = function(width) {
         if (width === undefined) {
             return this._width;
@@ -130,6 +150,14 @@ var Bucket = function(args) {
         return this;
     };
 
+    /** Sets or retrieves the height of the SVG container.
+     * @param {?string} height - The height of the SVG container.
+     * @return {string|Bucket} The current height if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.height('100px')
+     * bucket.height('100%')
+     * var height = bucket.height()
+     */
     this.height = function(height) {
         if (height === undefined) {
             return this._height;
@@ -262,26 +290,18 @@ var Bucket = function(args) {
     };
 
     this._renderContour = function() {
-        // Use to draw the bucket's contour
-        var bucketContour = [
-            {x: 0, y: 100}, // top-left
-            {x: 0, y: 0},  // bottom-left
-            {x: 100, y: 0}, // bottom-right
-            {x: 100, y: 100} //top-right
-        ];
-
-        // Redraw the contour over all of the other content
         this.svg.select('#bucketContour').remove();
         this.svg.append('path')
             .attr('id', 'bucketContour')
             .attr('fill', 'none')
             .attr('stroke', 'black')
             .attr('stroke-width', 4)
-            .attr('d', this._line(bucketContour));
+            .attr('d', this._line(this._bucketContour));
     };
 
     this._render = function(t) {
         this._renderFill(t);
+        // Always draw the contour last
         this._renderContour();
     };
 

@@ -17,15 +17,24 @@ module.exports = function(grunt) {
           src: ['src/*.js'],
           dest: '<%= pkg.name %>.js'
         }
+    },
+    jsdoc : {
+        dist : {
+            src: ['src/*.js', 'test/*.js'], 
+            options: {
+                destination: 'doc'
+            }
+        }
     }
   });
 
-  // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.loadNpmTasks('grunt-contrib-concat');
 
+  grunt.loadNpmTasks('grunt-jsdoc');
+
   // Default task(s).
-  grunt.registerTask('default', ['uglify', 'concat']);
+  grunt.registerTask('default', ['uglify', 'concat', 'jsdoc']);
 
 };
