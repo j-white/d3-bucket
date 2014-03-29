@@ -1,103 +1,187 @@
 var Bucket = function(args) {
+    "use strict";
     this.initialize = function(args) {
-        if (!args.element) throw "Bucket needs a reference to an element";
-        if (args.element.nodeType !== 1) throw "Bucket element was defined but not an HTML element";
+        var defaultWidth = 500,
+            defaultHeight = 350,
+            defaultMargin = 40,
+            defaultLevel = 50,
+            defaultPhase = 0,
+            defaultFrequency = 0.18,
+            defaultAmplitude = 6,
+            style,
+            elementWidth = 0,
+            elementHeight = 0;
+
+        if (!args.element) {
+            throw "Bucket needs a reference to an element";
+        }
+        if (args.element.nodeType !== 1) {
+            throw "Bucket element was defined but not an HTML element";
+        }
         this.element = args.element;
 
-        this.margin = 40;
-
-        if (args.wavePhase) {
-            this.wavePhase = args.wavePhase;
-        } else {
-            this.wavePhase = 0;
+        // Determine the element's current size, if possible
+        if (typeof window !== 'undefined') {
+            style = window.getComputedStyle(this.element, null);
+            elementWidth = parseInt(style.getPropertyValue('width'), 0);
+            elementHeight = parseInt(style.getPropertyValue('height'), 0);
         }
 
-        if (args.waveFrequency) {
-            this.waveFrequency = args.waveFrequency;
+        // Use the given dimensions, if specified, otherwise fallback to the element's dimensions.
+        // If those are unavailable, use the defaults.
+        this.width(args.width || elementWidth || defaultWidth);
+        this.height(args.height || elementHeight || defaultHeight);
+
+        if (args.margin !== undefined) {
+            this.margin(args.margin);
         } else {
-            this.waveFrequency = 0.2;
+            this.margin(defaultMargin);
         }
 
-        if (args.waveHeight) {
-            this.waveHeight = args.waveHeight;
+        if (args.level !== undefined) {
+            this.level(args.level);
         } else {
-            this.waveHeight = 5;
+            this.level(defaultLevel);
         }
 
-        this.timeShift = Math.random() * Math.PI;
+        if (args.phase !== undefined) {
+            this.phase(args.phase);
+        } else {
+            this.phase(defaultPhase);
+        }
 
-        this.defaultLevel = 50;
-        this.defaultWidth = 500;
-        this.defaultHeight = 350;
+        if (args.frequency !== undefined) {
+            this.frequency(args.frequency);
+        } else {
+            this.frequency(defaultFrequency);
+        }
 
-        this.setLevel(args.level);
-        this.setSize({ width: args.width, height: args.height });
+        if (args.amplitude !== undefined) {
+            this.amplitude(args.amplitude);
+        } else {
+            this.amplitude(defaultAmplitude);
+        }
 
+        if (args.timeShift !== undefined) {
+            this.timeShift(args.timeShift);
+        } else {
+            this.timeShift(Math.random() * Math.PI);
+        }
+
+        // Append the SVG container to the HTML element
         this.svg = d3.select(this.element)
             .append("svg:svg")
-            .attr('width', this.width)
-            .attr('height', this.height);
+            .attr('width', this._width)
+            .attr('height', this._height);
 
+        // Setup our scales. The remaining functions will assume the canvas has
+        // a domain of { (x,y) | 0 <= x <= 100, 0 <= y <= 100 }
         var x = d3.scale.linear()
             .domain([0, 100])
-            .range([this.margin, this.width - this.margin]);
+            .range([this._margin, this._width - this._margin]);
+
         var y = d3.scale.linear()
             .domain([0, 100])
-            .range([this.height - this.margin, this.margin]);
+            .range([this._height - this._margin, this._margin]);
+
+        // Our line generating function used when drawing paths
         this._line = d3.svg.line()
             .x(function(d){return x(d.x);})
             .y(function(d){return y(d.y);})
             .interpolate("linear");
     };
 
+    this.width = function(width) {
+        if (width === undefined) {
+            return this._width;
+        }
+        this._width = width;
+        if (this.svg !== undefined) {
+            this.svg.attr('width', this._width);
+        }
+        return this;
+    };
+
+    this.height = function(height) {
+        if (height === undefined) {
+            return this._height;
+        }
+        this._height = height;
+        if (this.svg !== undefined) {
+            this.svg.attr('height', this._height);
+        }
+        return this;
+    };
+
+    this.margin = function(margin) {
+        if (margin === undefined) {
+            return this._margin;
+        }
+        this._margin = margin;
+        return this;
+    };
+
+    this.level = function(level) {
+        if (level === undefined) {
+            return this._level;
+        } else {
+            this._level = level;
+        }
+        return this;
+    };
+
+    this.phase = function(phase) {
+        if (phase === undefined) {
+            return this._phase;
+        } else {
+            this._phase = phase;
+        }
+        return this;
+    };
+
+    this.frequency = function(frequency) {
+        if (frequency === undefined) {
+            return this._frequency;
+        } else {
+            this._frequency = frequency;
+        }
+        return this;
+    };
+
+    this.amplitude = function(amplitude) {
+        if (amplitude === undefined) {
+            return this._amplitude;
+        } else {
+            this._amplitude = amplitude;
+        }
+        return this;
+    };
+
+    this.timeShift = function(timeShift) {
+        if (timeShift === undefined) {
+            return this._timeShift;
+        } else {
+            this._timeShift = timeShift;
+        }
+        return this;
+    };
+
     this.fillColor = function() {
-        if (this.level < 75) {
+        if (this._level < 75) {
             return "green";
-        } else if (this.level < 90) {
+        } else if (this._level < 90) {
             return "yellow";
         } else {
             return "red";
         }
     };
 
-    this.setLevel = function(level) {
-        if (level === undefined) {
-            this.level = this.defaultLevel;
-        } else {
-            this.level = level;
-        }
-
-        return this;
-    };
-
-    this.setSize = function(args) {
-        var style,
-            elementWidth,
-            elementHeight;
-
-        if (typeof window !== undefined) {
-            style = window.getComputedStyle(this.element, null);
-            elementWidth = parseInt(style.getPropertyValue('width'), 0);
-            elementHeight = parseInt(style.getPropertyValue('height'), 0);
-        }
-
-        args = args || {};
-        this.width = args.width || elementWidth || this.defaultWidth;
-        this.height = args.height || elementHeight || this.defaultHeight;
-
-        if (this.svg !== undefined) {
-            this.svg.attr('width', this.width).attr('height', this.height);
-        }
-
-        return this;
-    };
-
     this._generateWaveVector = function(t) {
-        var level = this.level;
+        var level = this._level;
 
         // Make the wave height proportional to the current level
         // - the higher the level, the higher the wave
-        var waveHeight = this.waveHeight * (level / 100);
+        var waveHeight = this._amplitude * (level / 100);
         waveHeight = Math.max(waveHeight, 1);
 
         // Scale the range our wave function to the available
@@ -110,9 +194,9 @@ var Bucket = function(args) {
             ]);
 
         // Our wave function
-        var t0 = this.timeShift;
-        var omega = this.waveFrequency;
-        var phi = this.wavePhase;
+        var t0 = this._timeShift;
+        var omega = this._frequency;
+        var phi = this._phase;
         var waveFunction = function(x, t) {
             return Math.cos(t + t0) * Math.sin(omega * x + phi);
         };
@@ -125,10 +209,8 @@ var Bucket = function(args) {
             };
         });
 
-        /*
-         Add the lower portion of the bucket (bellow the wave)
-         to the path and close the loop.
-         */
+        // Add the lower portion of the bucket (bellow the wave)
+        // to the path, and close the loop.
         var before = [
             {x: 0,y: 0},
             {x: 0,y: level}
@@ -153,7 +235,7 @@ var Bucket = function(args) {
             .attr("d", this._line(this._generateWaveVector(t)));
     };
 
-    this._renderContour = function(t) {
+    this._renderContour = function() {
         // Use to draw the bucket's contour
         var bucketContour = [
             {x: 0, y: 100}, // top-left
@@ -174,7 +256,7 @@ var Bucket = function(args) {
 
     this._render = function(t) {
         this._renderFill(t);
-        this._renderContour(t);
+        this._renderContour();
     };
 
     this.render = function() {
