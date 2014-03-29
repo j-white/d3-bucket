@@ -26,12 +26,12 @@
 
             var slider = $("#slider");
             slider.slider({
-                value: bucket1.level,
+                value: bucket1.level(),
                 min: 0,
                 max: 100,
                 step: 1,
                 slide: function(event, ui) {
-                    bucket1.setLevel(ui.value);
+                    bucket1.level(ui.value);
                     $("#level").val(ui.value);
                 }
             });
