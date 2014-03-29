@@ -1,5 +1,13 @@
 {
     "globals" : {
-        "d3"         : false
+        "d3"         : false,
+        "it"         : false,
+        "xit"        : false,
+        "describe"   : false,
+        "xdescribe"  : false,
+        "beforeEach" : false,
+        "afterEach"  : false,
+        "expect"     : false,
+        "spyOn"      : false
     }
 }
