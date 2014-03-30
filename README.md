@@ -14,3 +14,8 @@ Building
     $ npm install
     $ npm test
     $ grunt
+
+API Docs
+====
+
+See [API Docs(http://htmlpreview.github.io/?https://raw.github.com/j-white/d3-bucket/master/doc/Bucket.html)
