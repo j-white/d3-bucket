@@ -1,4 +1,31 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: d3-bucket.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: d3-bucket.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
  * An animated bucket with a surface wave created with D3.
  *
  * @constructor
@@ -6,11 +33,11 @@
  * @param {string} [args.width] Width of the SVG container.
  * @param {string} [args.height] Height of the SVG container.
  * @param {string} [args.margin] Left, right, top and bottom margin used within SVG container.
- * @param {number} [args.level] Level of the bucket, where 0 <= level <= 100.
+ * @param {number} [args.level] Level of the bucket, where 0 &lt;= level &lt;= 100.
  * @param {function} [args.fillColor] Callback used to determine the fill's color from the current level.
- * @param {number} [args.phase] Phase shift of the surface wave, , 0 <= frequency <= 2 Pi.
- * @param {number} [args.frequency] Frequency of the surface wave, 0 <= frequency <= 2 Pi.
- * @param {number} [args.amplitude] Amplitude of the surface wave, 0 <= amplitude <= 100.
+ * @param {number} [args.phase] Phase shift of the surface wave, , 0 &lt;= frequency &lt;= 2 Pi.
+ * @param {number} [args.frequency] Frequency of the surface wave, 0 &lt;= frequency &lt;= 2 Pi.
+ * @param {number} [args.amplitude] Amplitude of the surface wave, 0 &lt;= amplitude &lt;= 100.
  */
 var Bucket = function(args) {
     'use strict';
@@ -59,9 +86,9 @@ var Bucket = function(args) {
         }
 
         defaultFillColor = function(level) {
-            if (level < 75) {
+            if (level &lt; 75) {
                 return 'green';
-            } else if (level < 90) {
+            } else if (level &lt; 90) {
                 return 'yellow';
             } else {
                 return 'red';
@@ -120,7 +147,7 @@ var Bucket = function(args) {
         }
 
         // Setup our scales. The other functions will assume the canvas has
-        // a domain of { (x,y) | 0 <= x <= 100, 0 <= y <= 100 }
+        // a domain of { (x,y) | 0 &lt;= x &lt;= 100, 0 &lt;= y &lt;= 100 }
         var x = d3.scale.linear()
             .domain([0, 100])
             .range([this._margin, this._width - this._margin]);
@@ -188,7 +215,7 @@ var Bucket = function(args) {
     };
 
     /** Sets or retrieves the level of the bucket's fill.
-     * @param {?number} level - The level of the bucket, where 0 <= level <= 100.
+     * @param {?number} level - The level of the bucket, where 0 &lt;= level &lt;= 100.
      * @return {number|Bucket} The current level if none was specified, or a reference to the current bucket.
      * @example
      * bucket.level(10)
@@ -207,7 +234,7 @@ var Bucket = function(args) {
      * This can be used to offset the wave if multiple buckets are drawn on the same page.
      * A random value is used by default.
      *
-     * @param {?number} phase - The wave's phase shift, where 0 <= phase <= 2 Pi.
+     * @param {?number} phase - The wave's phase shift, where 0 &lt;= phase &lt;= 2 Pi.
      * @return {number|Bucket} The current phase shift if none was specified, or a reference to the current bucket.
      * @example
      * bucket.phase(0.5 * Math.PI)
@@ -225,7 +252,7 @@ var Bucket = function(args) {
     /** Sets or retrieves the frequency of the fill's surface wave.
      * With a higher frequency there will be more narrower peeks on the fill's surface.
      *
-     * @param {?number} frequency - The wave's frequency, where 0 <= frequency <= 2 Pi.
+     * @param {?number} frequency - The wave's frequency, where 0 &lt;= frequency &lt;= 2 Pi.
      * @return {number|Bucket} The current frequency if none was specified, or a reference to the current bucket.
      * @example
      * bucket.frequency(0.5 * Math.PI)
@@ -245,7 +272,7 @@ var Bucket = function(args) {
      * The amplitude is also scaled based on the bucket current level, only a fraction of the amplitude is used
      * when the level is low.
      *
-     * @param {?number} amplitude - The wave's amplitude, where 0 <= amplitude <= 100.
+     * @param {?number} amplitude - The wave's amplitude, where 0 &lt;= amplitude &lt;= 100.
      * @return {number|Bucket} The current amplitude if none was specified, or a reference to the current bucket.
      * @example
      * bucket.amplitude(50)
@@ -261,7 +288,7 @@ var Bucket = function(args) {
     };
 
     /** Sets or retrieves the fill color generator function.
-     * Given a 0 <= level <= 100, the function should return a color (string) suitable for setting
+     * Given a 0 &lt;= level &lt;= 100, the function should return a color (string) suitable for setting
      * the fill's (an SVG path) 'fill' and 'stroke' attributes.
      *
      * @callback fillColor - The fill color generator function.
@@ -394,4 +421,26 @@ var Bucket = function(args) {
     };
 
     this.initialize(args);
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Bucket.html">Bucket</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Mar 29 2014 21:34:32 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

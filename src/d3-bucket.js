@@ -1,6 +1,16 @@
 /**
- * Represents a bucket.
+ * An animated bucket with a surface wave created with D3.
+ *
  * @constructor
+ * @param {object} args Initial configuration.
+ * @param {string} [args.width] Width of the SVG container.
+ * @param {string} [args.height] Height of the SVG container.
+ * @param {string} [args.margin] Left, right, top and bottom margin used within SVG container.
+ * @param {number} [args.level] Level of the bucket, where 0 <= level <= 100.
+ * @param {function} [args.fillColor] Callback used to determine the fill's color from the current level.
+ * @param {number} [args.phase] Phase shift of the surface wave, , 0 <= frequency <= 2 Pi.
+ * @param {number} [args.frequency] Frequency of the surface wave, 0 <= frequency <= 2 Pi.
+ * @param {number} [args.amplitude] Amplitude of the surface wave, 0 <= amplitude <= 100.
  */
 var Bucket = function(args) {
     'use strict';
@@ -10,7 +20,6 @@ var Bucket = function(args) {
             defaultMargin = 40,
             defaultLevel = 50,
             defaultFillColor,
-            defaultPhase = 0,
             defaultFrequency = 0.18,
             defaultAmplitude = 6,
             style,
@@ -68,7 +77,7 @@ var Bucket = function(args) {
         if (args.phase !== undefined) {
             this.phase(args.phase);
         } else {
-            this.phase(defaultPhase);
+            this.phase(Math.random() * Math.PI);
         }
 
         if (args.frequency !== undefined) {
@@ -81,12 +90,6 @@ var Bucket = function(args) {
             this.amplitude(args.amplitude);
         } else {
             this.amplitude(defaultAmplitude);
-        }
-
-        if (args.timeShift !== undefined) {
-            this.timeShift(args.timeShift);
-        } else {
-            this.timeShift(Math.random() * Math.PI);
         }
 
         // Append the SVG container to the HTML element
@@ -167,6 +170,14 @@ var Bucket = function(args) {
         return this;
     };
 
+    /** Sets or retrieves the inner margin used when drawing the contents of the SVG container.
+     * @param {?string} margin - The left,right,top and bottom margin used within SVG container.
+     * @return {string|Bucket} The current margin if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.margin('30px')
+     * bucket.margin('25%')
+     * var margin = bucket.margin()
+     */
     this.margin = function(margin) {
         if (margin === undefined) {
             return this._margin;
@@ -176,6 +187,13 @@ var Bucket = function(args) {
         return this;
     };
 
+    /** Sets or retrieves the level of the bucket's fill.
+     * @param {?number} level - The level of the bucket, where 0 <= level <= 100.
+     * @return {number|Bucket} The current level if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.level(10)
+     * var level = bucket.level()
+     */
     this.level = function(level) {
         if (level === undefined) {
             return this._level;
@@ -185,6 +203,16 @@ var Bucket = function(args) {
         return this;
     };
 
+    /** Sets or retrieves the phase shift of the fill's surface wave.
+     * This can be used to offset the wave if multiple buckets are drawn on the same page.
+     * A random value is used by default.
+     *
+     * @param {?number} phase - The wave's phase shift, where 0 <= phase <= 2 Pi.
+     * @return {number|Bucket} The current phase shift if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.phase(0.5 * Math.PI)
+     * var phase = bucket.phase()
+     */
     this.phase = function(phase) {
         if (phase === undefined) {
             return this._phase;
@@ -194,6 +222,15 @@ var Bucket = function(args) {
         return this;
     };
 
+    /** Sets or retrieves the frequency of the fill's surface wave.
+     * With a higher frequency there will be more narrower peeks on the fill's surface.
+     *
+     * @param {?number} frequency - The wave's frequency, where 0 <= frequency <= 2 Pi.
+     * @return {number|Bucket} The current frequency if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.frequency(0.5 * Math.PI)
+     * var frequency = bucket.frequency()
+     */
     this.frequency = function(frequency) {
         if (frequency === undefined) {
             return this._frequency;
@@ -203,6 +240,17 @@ var Bucket = function(args) {
         return this;
     };
 
+    /** Sets or retrieves the amplitude of the fill's surface wave.
+     * The amplitude is made relative to the buckets height, where 100 denotes the full height of a bucket.
+     * The amplitude is also scaled based on the bucket current level, only a fraction of the amplitude is used
+     * when the level is low.
+     *
+     * @param {?number} amplitude - The wave's amplitude, where 0 <= amplitude <= 100.
+     * @return {number|Bucket} The current amplitude if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.amplitude(50)
+     * var amplitude = bucket.amplitude()
+     */
     this.amplitude = function(amplitude) {
         if (amplitude === undefined) {
             return this._amplitude;
@@ -212,15 +260,17 @@ var Bucket = function(args) {
         return this;
     };
 
-    this.timeShift = function(timeShift) {
-        if (timeShift === undefined) {
-            return this._timeShift;
-        } else {
-            this._timeShift = timeShift;
-        }
-        return this;
-    };
-
+    /** Sets or retrieves the fill color generator function.
+     * Given a 0 <= level <= 100, the function should return a color (string) suitable for setting
+     * the fill's (an SVG path) 'fill' and 'stroke' attributes.
+     *
+     * @callback fillColor - The fill color generator function.
+     * @return {function|Bucket} The fill color generator function if none was specified, or a reference to the current bucket.
+     * @example
+     * bucket.fillColor(function(level){ return "green"; })
+     * var fillColor = bucket.fillColor()
+     * fillColor(100)
+     */
     this.fillColor = function(fillColor) {
         if (fillColor === undefined) {
             return this._fillColor;
@@ -248,11 +298,10 @@ var Bucket = function(args) {
             ]);
 
         // Our wave function
-        var t0 = this._timeShift;
         var omega = this._frequency;
         var phi = this._phase;
         var waveFunction = function(x, t) {
-            return Math.cos(t + t0) * Math.sin(omega * x + phi);
+            return Math.cos(t) * Math.sin(omega * x + phi);
         };
 
         // Generate the vector
@@ -305,7 +354,17 @@ var Bucket = function(args) {
         this._renderContour();
     };
 
-    this.render = function(doNotLoop) {
+
+    /** Renders the bucket and animates the surface wave by redrawing the bucket
+     * every 100ms.
+     *
+     * @param {?boolean} animate - If set the false, the bucket will be drawn but the surface wave will not be animated.
+     * @return {Bucket} A reference to the current bucket.
+     * @example
+     * bucket.render()
+     * bucket.render(false)
+     */
+    this.render = function(animate) {
         // Cancel any previous timers
         if (this._renderInterval !== undefined) {
             clearInterval(this._renderInterval);
@@ -320,8 +379,8 @@ var Bucket = function(args) {
         var t = 0;
         bucket._render(t);
 
-        // Stop here if were told not to loop
-        if (doNotLoop) {
+        // Stop here if were told not to animate
+        if (animate === false) {
             return this;
         }
 
